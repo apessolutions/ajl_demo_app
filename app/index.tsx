@@ -4,11 +4,11 @@ import { Pressable, Text, View } from "react-native";
 
 export default function Index() {
   return (
-    <PostHogProvider apiKey="phc_lw7avLE9sYgTmocLLe0kpfsUobxSeFyAqDym62Mayah" options={{
-      host: "https://posthogv2.apessolutionsdev.com",
-
-    }}>
-
+    <PostHogProvider apiKey="phc_lw7avLE9sYgTmocLLe0kpfsUobxSeFyAqDym62Mayah"
+      autocapture={true}
+      options={{
+        host: "https://posthogv2.apessolutionsdev.com",
+      }}>
       <HomeScreen />
     </PostHogProvider>
   );
@@ -17,10 +17,8 @@ export default function Index() {
 
 
 const HomeScreen = () => {
-  const posthog = usePostHog()
-
+  const posthog = usePostHog();
   useEffect(() => {
-    // posthog.capture("Screen loaded", { screen: "Home" })
     posthog.screen("Home");
   }, [posthog]);
   const handleClick = () => {
