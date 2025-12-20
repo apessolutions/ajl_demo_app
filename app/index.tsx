@@ -1,16 +1,12 @@
-import { PostHogProvider, usePostHog } from 'posthog-react-native';
+import { HOME_CUSTOM_EVENTS, SCREEN_NAMES } from "@/constants/events";
+import { useRouter } from "expo-router";
+import { usePostHog } from 'posthog-react-native';
 import { useEffect } from 'react';
-import { Pressable, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
   return (
-    <PostHogProvider apiKey="phc_lw7avLE9sYgTmocLLe0kpfsUobxSeFyAqDym62Mayah"
-      autocapture={true}
-      options={{
-        host: "https://posthogv2.apessolutionsdev.com",
-      }}>
-      <HomeScreen />
-    </PostHogProvider>
+    <HomeScreen />
   );
 }
 
@@ -18,23 +14,53 @@ export default function Index() {
 
 const HomeScreen = () => {
   const posthog = usePostHog();
+  const router = useRouter();
+
   useEffect(() => {
-    posthog.screen("Home");
-  }, [posthog]);
-  const handleClick = () => {
-    posthog.capture("Button clicked", { screen: "Home" });
-    console.log("Button clicked!");
+    posthog.screen(SCREEN_NAMES.HOME);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSignUp = () => {
+    posthog.capture(HOME_CUSTOM_EVENTS.SIGNUP_BUTTON_CLICKED);
+    router.push("/signup/personal-info");
   };
 
-  return <View
-    style={{
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <Pressable onPress={handleClick}>
-      <Text>Edit app/index.tsx to edit this screen</Text>
-    </Pressable>
-  </View>;
+  const handleLogin = () => {
+    posthog.capture(HOME_CUSTOM_EVENTS.LOGIN_BUTTON_CLICKED);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Pressable style={styles.button} onPress={handleSignUp}>
+        <Text style={styles.buttonText}>Sign Up</Text>
+      </Pressable>
+      <Pressable style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Login</Text>
+      </Pressable>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 20,
+    padding: 20,
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    paddingHorizontal: 40,
+    paddingVertical: 15,
+    borderRadius: 8,
+    minWidth: 200,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});
