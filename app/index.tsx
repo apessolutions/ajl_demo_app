@@ -22,12 +22,17 @@ const HomeScreen = () => {
   }, []);
 
   const handleSignUp = () => {
-    posthog.capture(HOME_CUSTOM_EVENTS.SIGNUP_BUTTON_CLICKED);
+    posthog.capture(HOME_CUSTOM_EVENTS.SIGNUP_BUTTON_CLICK);
     router.push("/signup/personal-info");
   };
 
   const handleLogin = () => {
-    posthog.capture(HOME_CUSTOM_EVENTS.LOGIN_BUTTON_CLICKED);
+    posthog.capture(HOME_CUSTOM_EVENTS.LOGIN_BUTTON_CLICK);
+  };
+
+  const handleCashJameel = () => {
+    posthog.capture(HOME_CUSTOM_EVENTS.CASH_JAMEEL_BUTTON_CLICK);
+    router.push("/cash-jameel/welcome");
   };
 
   return (
@@ -37,6 +42,9 @@ const HomeScreen = () => {
       </Pressable>
       <Pressable style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
+      </Pressable>
+      <Pressable style={styles.button} onPress={handleCashJameel}>
+        <Text style={styles.buttonText}>Cash Jameel</Text>
       </Pressable>
     </View>
   );
