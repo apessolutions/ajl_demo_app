@@ -9,7 +9,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.apessolutionsdev.ajl",
+      "associatedDomains": [
+        "applinks:ajl.apessolutionsdev.com"
+      ],
+      "appleTeamId": "9TWZFRU6S5"
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +25,23 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.ajl"
+      "package": "com.apessolutionsdev.ajl",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "ajl.apessolutionsdev.com"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "output": "static",
