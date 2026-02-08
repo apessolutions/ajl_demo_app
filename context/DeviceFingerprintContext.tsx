@@ -83,18 +83,18 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
   }, [utmParameters]);
 
   // Check if fingerprint has been sent before
-  // useEffect(() => {
-  //   const checkFingerprintStatus = async () => {
-  //     try {
-  //       const hasSent = await AsyncStorage.getItem(FINGERPRINT_SENT_KEY);
-  //       setHasSentFingerprint(hasSent === "true");
-  //     } catch (err) {
-  //       console.error("Error checking fingerprint status:", err);
-  //     }
-  //   };
+  useEffect(() => {
+    const checkFingerprintStatus = async () => {
+      try {
+        const hasSent = await AsyncStorage.getItem(FINGERPRINT_SENT_KEY);
+        setHasSentFingerprint(hasSent === "true");
+      } catch (err) {
+        console.error("Error checking fingerprint status:", err);
+      }
+    };
 
-  //   checkFingerprintStatus();
-  // }, []);
+    checkFingerprintStatus();
+  }, []);
 
   // Post fingerprint to endpoint only on first app launch
   useEffect(() => {
