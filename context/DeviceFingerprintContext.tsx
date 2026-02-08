@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { Dimensions, PixelRatio, Platform } from "react-native";
 import * as Device from "expo-device";
 import * as Localization from "expo-localization";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface FingerprintData {
   ip_address: string;
@@ -24,11 +25,14 @@ interface DeviceFingerprintContextType {
 
 const DeviceFingerprintContext = createContext<DeviceFingerprintContextType | undefined>(undefined);
 
+const FINGERPRINT_SENT_KEY = "@fingerprint_sent";
+
 export function DeviceFingerprintProvider({ children }: { children: React.ReactNode }) {
   const [fingerprintData, setFingerprintData] = useState<FingerprintData | null>(null);
   const [utmParameters, setUTMParameters] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasSentFingerprint, setHasSentFingerprint] = useState<boolean>(false);
 
   // Collect device fingerprint data
   useEffect(() => {
@@ -84,12 +88,26 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
     collectFingerprint();
   }, [utmParameters]);
 
-  // Post fingerprint to endpoint
+  // Check if fingerprint has been sent before
   useEffect(() => {
-    if (fingerprintData && !isLoading) {
+    const checkFingerprintStatus = async () => {
+      try {
+        const hasSent = await AsyncStorage.getItem(FINGERPRINT_SENT_KEY);
+        setHasSentFingerprint(hasSent === "true");
+      } catch (err) {
+        console.error("Error checking fingerprint status:", err);
+      }
+    };
+
+    checkFingerprintStatus();
+  }, []);
+
+  // Post fingerprint to endpoint only on first app launch
+  useEffect(() => {
+    if (fingerprintData && !isLoading && !hasSentFingerprint) {
       const postFingerprint = async () => {
         try {
-          console.log("Posting fingerprint data:", fingerprintData);
+          console.log("Posting fingerprint data (first launch):", fingerprintData);
 
           const response = await fetch(
             "https://ajltrack.apessolutionsdev.com/api/v1/fingerprints",
@@ -108,6 +126,10 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
 
           const result = await response.json();
           console.log("Fingerprint posted successfully:", result);
+
+          // Mark fingerprint as sent
+          await AsyncStorage.setItem(FINGERPRINT_SENT_KEY, "true");
+          setHasSentFingerprint(true);
         } catch (err) {
           console.error("Error posting fingerprint:", err);
           setError(err instanceof Error ? err.message : "Failed to post fingerprint");
@@ -116,7 +138,7 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
 
       postFingerprint();
     }
-  }, [fingerprintData, isLoading]);
+  }, [fingerprintData, isLoading, hasSentFingerprint]);
 
   const value: DeviceFingerprintContextType = {
     fingerprintData,
