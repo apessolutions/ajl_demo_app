@@ -4,7 +4,7 @@ import { useDeviceFingerprint } from "@/context/DeviceFingerprintContext";
 
 export default function DeviceStats() {
   const router = useRouter();
-  const { fingerprintData } = useDeviceFingerprint();
+  const { fingerprintData, matchResponse } = useDeviceFingerprint();
 
   if (!fingerprintData) {
     return (
@@ -51,6 +51,39 @@ export default function DeviceStats() {
                   <Text style={styles.utmValue}>{String(value)}</Text>
                 </View>
               ))}
+            </View>
+          </>
+        )}
+
+        {matchResponse && (
+          <>
+            <Text style={styles.sectionTitle}>Match Response</Text>
+            <View style={styles.matchContainer}>
+              <View style={styles.matchItem}>
+                <Text style={styles.matchLabel}>Matched:</Text>
+                <Text style={[styles.matchValue, matchResponse.matched ? styles.matchedTrue : styles.matchedFalse]}>
+                  {matchResponse.matched ? "Yes" : "No"}
+                </Text>
+              </View>
+
+              {matchResponse.fingerprint_id && (
+                <View style={styles.matchItem}>
+                  <Text style={styles.matchLabel}>Fingerprint ID:</Text>
+                  <Text style={styles.matchValue}>{matchResponse.fingerprint_id}</Text>
+                </View>
+              )}
+
+              {matchResponse.custom_parameters && Object.keys(matchResponse.custom_parameters).length > 0 && (
+                <>
+                  <Text style={styles.matchSubtitle}>Custom Parameters from Match:</Text>
+                  {Object.entries(matchResponse.custom_parameters).map(([key, value]) => (
+                    <View key={key} style={styles.matchParamItem}>
+                      <Text style={styles.matchParamLabel}>{key}:</Text>
+                      <Text style={styles.matchParamValue}>{String(value)}</Text>
+                    </View>
+                  ))}
+                </>
+              )}
             </View>
           </>
         )}
@@ -140,10 +173,69 @@ const styles = StyleSheet.create({
     color: "#333",
     flex: 1,
   },
+  matchContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 8,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+  },
+  matchItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0F0F0",
+  },
+  matchLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#666",
+    marginRight: 8,
+    minWidth: 120,
+  },
+  matchValue: {
+    fontSize: 14,
+    color: "#333",
+    flex: 1,
+    fontWeight: "500",
+  },
+  matchedTrue: {
+    color: "#2E7D32",
+    fontWeight: "bold",
+  },
+  matchedFalse: {
+    color: "#D32F2F",
+    fontWeight: "bold",
+  },
+  matchSubtitle: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#888",
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  matchParamItem: {
+    flexDirection: "row",
+    paddingVertical: 6,
+    paddingLeft: 12,
+  },
+  matchParamLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#999",
+    marginRight: 8,
+  },
+  matchParamValue: {
+    fontSize: 12,
+    color: "#666",
+    flex: 1,
+  },
   statusContainer: {
     backgroundColor: "#E8F5E9",
     borderRadius: 8,
     padding: 12,
+    marginTop: 20,
   },
   statusText: {
     fontSize: 14,

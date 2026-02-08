@@ -15,8 +15,15 @@ interface FingerprintData {
   custom_parameters: Record<string, string>;
 }
 
+interface MatchResponse {
+  matched: boolean;
+  custom_parameters: Record<string, string> | null;
+  fingerprint_id: string | null;
+}
+
 interface DeviceFingerprintContextType {
   fingerprintData: FingerprintData | null;
+  matchResponse: MatchResponse | null;
   utmParameters: Record<string, string>;
   setUTMParameters: (params: Record<string, string>) => void;
   isLoading: boolean;
@@ -29,6 +36,7 @@ const FINGERPRINT_SENT_KEY = "@fingerprint_sent";
 
 export function DeviceFingerprintProvider({ children }: { children: React.ReactNode }) {
   const [fingerprintData, setFingerprintData] = useState<FingerprintData | null>(null);
+  const [matchResponse, setMatchResponse] = useState<MatchResponse | null>(null);
   const [utmParameters, setUTMParameters] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -110,7 +118,7 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
           console.log("Posting fingerprint data (first launch):", fingerprintData);
 
           const response = await fetch(
-            "https://ajltrack.apessolutionsdev.com/api/v1/fingerprints",
+            "https://ajltrack.apessolutionsdev.com/api/v1/fingerprints/match",
             {
               method: "POST",
               headers: {
@@ -124,8 +132,11 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
-          const result = await response.json();
-          console.log("Fingerprint posted successfully:", result);
+          const result: MatchResponse = await response.json();
+          console.log("Fingerprint match response:", result);
+
+          // Store the match response
+          setMatchResponse(result);
 
           // Mark fingerprint as sent
           await AsyncStorage.setItem(FINGERPRINT_SENT_KEY, "true");
@@ -142,6 +153,7 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
 
   const value: DeviceFingerprintContextType = {
     fingerprintData,
+    matchResponse,
     utmParameters,
     setUTMParameters,
     isLoading,
