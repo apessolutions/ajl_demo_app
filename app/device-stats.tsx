@@ -18,10 +18,7 @@ export default function DeviceStats() {
   const serverData = [
     { label: "IP Address", value: fingerprintData.ip_address },
     { label: "Width", value: `${fingerprintData.width}px` },
-    { label: "Height", value: `${fingerprintData.height}px` },
     { label: "Timezone", value: fingerprintData.timezone },
-    { label: "Model", value: fingerprintData.model },
-    { label: "OS Version", value: fingerprintData.os_version },
     { label: "Platform", value: fingerprintData.platform },
   ];
 

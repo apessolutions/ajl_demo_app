@@ -1,16 +1,12 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { Dimensions, PixelRatio, Platform } from "react-native";
-import * as Device from "expo-device";
-import * as Localization from "expo-localization";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Localization from "expo-localization";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { Dimensions } from "react-native";
 
 interface FingerprintData {
   ip_address: string;
   width: number;
-  height: number;
   timezone: string;
-  model: string;
-  os_version: string;
   platform: string;
   custom_parameters: Record<string, string>;
 }
@@ -51,17 +47,10 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
         // Get screen dimensions
         const screenData = Dimensions.get("window");
         const screenWidth = screenData.width;
-        const screenHeight = screenData.height;
 
         // Get timezone
         const calendars = Localization.getCalendars();
         const timezone = calendars[0]?.timeZone || "Unknown";
-
-        // Get device model
-        const deviceModel = Device.modelName || "Unknown";
-
-        // Get OS version
-        const osVersion = Device.osVersion || "Unknown";
 
         // Fetch IP address
         let ipAddress = "Unknown";
@@ -76,10 +65,7 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
         const fingerprint: FingerprintData = {
           ip_address: ipAddress,
           width: Math.round(screenWidth),
-          height: Math.round(screenHeight),
           timezone,
-          model: deviceModel,
-          os_version: osVersion,
           platform: "mobile",
           custom_parameters: utmParameters,
         };
@@ -97,18 +83,18 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
   }, [utmParameters]);
 
   // Check if fingerprint has been sent before
-  useEffect(() => {
-    const checkFingerprintStatus = async () => {
-      try {
-        const hasSent = await AsyncStorage.getItem(FINGERPRINT_SENT_KEY);
-        setHasSentFingerprint(hasSent === "true");
-      } catch (err) {
-        console.error("Error checking fingerprint status:", err);
-      }
-    };
+  // useEffect(() => {
+  //   const checkFingerprintStatus = async () => {
+  //     try {
+  //       const hasSent = await AsyncStorage.getItem(FINGERPRINT_SENT_KEY);
+  //       setHasSentFingerprint(hasSent === "true");
+  //     } catch (err) {
+  //       console.error("Error checking fingerprint status:", err);
+  //     }
+  //   };
 
-    checkFingerprintStatus();
-  }, []);
+  //   checkFingerprintStatus();
+  // }, []);
 
   // Post fingerprint to endpoint only on first app launch
   useEffect(() => {
