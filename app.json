@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.apessolutionsdev.ajl",
+      "buildNumber": "3",
       "associatedDomains": [
         "applinks:ajl.apessolutionsdev.com"
       ],
