@@ -2,11 +2,13 @@ import * as Linking from "expo-linking";
 import { Stack, useRouter } from "expo-router";
 import { PostHogProvider, usePostHog } from "posthog-react-native";
 import { useEffect, useRef } from "react";
+import { DeviceFingerprintProvider, useDeviceFingerprint } from "@/context/DeviceFingerprintContext";
 
 // Component to handle deep linking and UTM tracking
 function DeepLinkHandler({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const posthog = usePostHog();
+  const { setUTMParameters } = useDeviceFingerprint();
   const hasProcessedInitialUrl = useRef(false);
 
   // Extract UTM parameters from query params
@@ -25,12 +27,15 @@ function DeepLinkHandler({ children }: { children: React.ReactNode }) {
     return utmParams;
   };
 
-  // Register UTM parameters as super properties in PostHog
+  // Register UTM parameters as super properties in PostHog and DeviceFingerprint
   const registerUTMParams = (utmParams: Record<string, string>) => {
     if (Object.keys(utmParams).length > 0) {
       console.log("Registering UTM parameters:", utmParams);
 
-      // Register as super properties (will be included in all events)
+      // Store UTM parameters in device fingerprint context
+      setUTMParameters(utmParams);
+
+      // Register as super properties in PostHog (will be included in all events)
       posthog?.register(utmParams);
 
       // Also capture a specific event for attribution tracking
@@ -78,7 +83,7 @@ function DeepLinkHandler({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.remove();
     };
-  }, [router, posthog]);
+  }, [router, posthog, setUTMParameters]);
 
   return <>{children}</>;
 }
@@ -92,9 +97,11 @@ export default function RootLayout() {
         host: "https://posthogv2.apessolutionsdev.com",
       }}
     >
-      <DeepLinkHandler>
-        <Stack />
-      </DeepLinkHandler>
+      <DeviceFingerprintProvider>
+        <DeepLinkHandler>
+          <Stack />
+        </DeepLinkHandler>
+      </DeviceFingerprintProvider>
     </PostHogProvider>
   );
 }
