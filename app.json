@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.apessolutionsdev.ajl",
-      "buildNumber": "3",
+      "buildNumber": "6",
       "associatedDomains": [
         "applinks:ajl.apessolutionsdev.com"
       ],
@@ -65,8 +65,7 @@
       "expo-localization"
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": true
     }
   }
 }

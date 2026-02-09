@@ -1,8 +1,8 @@
+import { DeviceFingerprintProvider, useDeviceFingerprint } from "@/context/DeviceFingerprintContext";
 import * as Linking from "expo-linking";
 import { Stack, useRouter } from "expo-router";
 import { PostHogProvider, usePostHog } from "posthog-react-native";
 import { useEffect, useRef } from "react";
-import { DeviceFingerprintProvider, useDeviceFingerprint } from "@/context/DeviceFingerprintContext";
 
 // Component to handle deep linking and UTM tracking
 function DeepLinkHandler({ children }: { children: React.ReactNode }) {
@@ -28,6 +28,7 @@ function DeepLinkHandler({ children }: { children: React.ReactNode }) {
   };
 
   // Register UTM parameters as super properties in PostHog and DeviceFingerprint
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const registerUTMParams = (utmParams: Record<string, string>) => {
     if (Object.keys(utmParams).length > 0) {
       console.log("Registering UTM parameters:", utmParams);
@@ -83,7 +84,7 @@ function DeepLinkHandler({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.remove();
     };
-  }, [router, posthog, setUTMParameters]);
+  }, [router, posthog, setUTMParameters, registerUTMParams]);
 
   return <>{children}</>;
 }
