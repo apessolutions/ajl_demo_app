@@ -103,6 +103,10 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
         try {
           console.log("Posting fingerprint data (first launch):", fingerprintData);
 
+          // Create AbortController for timeout
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
           const response = await fetch(
             "https://ajltrack.apessolutionsdev.com/api/v1/fingerprints/match",
             {
@@ -111,8 +115,11 @@ export function DeviceFingerprintProvider({ children }: { children: React.ReactN
                 "Content-Type": "application/json",
               },
               body: JSON.stringify(fingerprintData),
+              signal: controller.signal,
             }
           );
+
+          clearTimeout(timeoutId);
 
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

@@ -2,7 +2,7 @@ import { DeviceFingerprintProvider, useDeviceFingerprint } from "@/context/Devic
 import * as Linking from "expo-linking";
 import { Stack, useRouter } from "expo-router";
 import { PostHogProvider, usePostHog } from "posthog-react-native";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 // Component to handle deep linking and UTM tracking
 function DeepLinkHandler({ children }: { children: React.ReactNode }) {
@@ -12,7 +12,7 @@ function DeepLinkHandler({ children }: { children: React.ReactNode }) {
   const hasProcessedInitialUrl = useRef(false);
 
   // Extract UTM parameters from query params
-  const extractUTMParams = (queryParams: Record<string, any> | null | undefined) => {
+  const extractUTMParams = useCallback((queryParams: Record<string, any> | null | undefined) => {
     if (!queryParams) return {};
 
     const utmParams: Record<string, string> = {};
@@ -25,11 +25,10 @@ function DeepLinkHandler({ children }: { children: React.ReactNode }) {
     });
 
     return utmParams;
-  };
+  }, []);
 
   // Register UTM parameters as super properties in PostHog and DeviceFingerprint
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const registerUTMParams = (utmParams: Record<string, string>) => {
+  const registerUTMParams = useCallback((utmParams: Record<string, string>) => {
     if (Object.keys(utmParams).length > 0) {
       console.log("Registering UTM parameters:", utmParams);
 
@@ -42,7 +41,7 @@ function DeepLinkHandler({ children }: { children: React.ReactNode }) {
       // Also capture a specific event for attribution tracking
       posthog?.capture('app_opened_with_utm', utmParams);
     }
-  };
+  }, [posthog, setUTMParameters]);
 
   useEffect(() => {
     const handleDeepLink = (event: { url: string }) => {
@@ -84,7 +83,7 @@ function DeepLinkHandler({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.remove();
     };
-  }, [router, posthog, setUTMParameters, registerUTMParams]);
+  }, [router, posthog, setUTMParameters, registerUTMParams, extractUTMParams]);
 
   return <>{children}</>;
 }
